@@ -79,7 +79,7 @@ class OrderLine(Model):
     OL_W_ID = columns.Integer()
     OL_D_ID = columns.Integer()
     OL_O_ID = columns.Integer()
-    OL_NUMBER = columns.Integer()
+    OL_NUMBER = columns.Integer(primary_key=True)
     OL_I_ID = columns.Integer()
     OL_DELIVERY_D = columns.DateTime()
     OL_AMOUNT = columns.Decimal()
@@ -89,8 +89,8 @@ class OrderLine(Model):
 
 
 class Stock(Model):
-    S_W_ID = columns.Integer()
-    S_D_ID = columns.Integer()
+    S_W_ID = columns.Integer(primary_key=True)
+    S_D_ID = columns.Integer(primary_key=True)
     S_QUANTITY = columns.Decimal()
     S_YTD = columns.Decimal()
     S_ORDER_CNT = columns.Integer()
