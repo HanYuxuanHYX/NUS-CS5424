@@ -112,7 +112,7 @@ class Stock(Model):
 # see http://datastax.github.io/python-driver/api/cassandra/cluster.html for options
 # the list of hosts will be passed to create a Cluster() instance
 if __name__ == '__main__':
-    connection.register_connection('cluster1', ['127.0.0.1'])
+    connection.register_connection('cluster1', ['192.168.48.174'])
     connection.register_connection('cluster2', ['192.168.48.175'])
     connection.register_connection('cluster3', ['192.168.48.176'])
     connection.register_connection('cluster4', ['192.168.48.177'])
