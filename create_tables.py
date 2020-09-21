@@ -115,8 +115,8 @@ class Stock(Model):
 if __name__ == '__main__':
     connection.register_connection('cluster1', IP_ADDRESS)
     conns = ['cluster1']
-    create_keyspace_simple(KEY_SPACE, replication_factor=3, connections=conns)
-
+    for keyspace in KEY_SPACE:
+        create_keyspace_simple(keyspace, replication_factor=3, connections=conns)
     sync_table(Warehouse, KEY_SPACE, conns)
     sync_table(District, KEY_SPACE, conns)
     sync_table(Customer, KEY_SPACE, conns)
