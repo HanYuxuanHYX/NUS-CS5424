@@ -1,9 +1,10 @@
-import uuid
 from cassandra.cqlengine import columns
 from cassandra.cqlengine import connection
-from datetime import datetime
 from cassandra.cqlengine.management import sync_table, create_keyspace_simple
 from cassandra.cqlengine.models import Model
+
+IP_ADDRESS = ['192.168.48.174']
+KEY_SPACE = ['ks']
 
 
 class Warehouse(Model):
@@ -112,20 +113,14 @@ class Stock(Model):
 # see http://datastax.github.io/python-driver/api/cassandra/cluster.html for options
 # the list of hosts will be passed to create a Cluster() instance
 if __name__ == '__main__':
-    connection.register_connection('cluster1', ['192.168.48.174'])
-    connection.register_connection('cluster2', ['192.168.48.175'])
-    connection.register_connection('cluster3', ['192.168.48.176'])
-    connection.register_connection('cluster4', ['192.168.48.177'])
-    connection.register_connection('cluster5', ['192.168.48.178'])
+    connection.register_connection('cluster1', IP_ADDRESS)
+    conns = ['cluster1']
+    create_keyspace_simple(KEY_SPACE, replication_factor=3, connections=conns)
 
-    keyspaces = ['ks']
-    conns = ['cluster1', 'cluster2', 'cluster3', 'cluster4', 'cluster5']
-    create_keyspace_simple('ks', connections=conns)
-
-    sync_table(Warehouse, keyspaces, conns)
-    sync_table(District, keyspaces, conns)
-    sync_table(Customer, keyspaces, conns)
-    sync_table(Order, keyspaces, conns)
-    sync_table(Item, keyspaces, conns)
-    sync_table(OrderLine, keyspaces, conns)
-    sync_table(Stock, keyspaces, conns)
+    sync_table(Warehouse, KEY_SPACE, conns)
+    sync_table(District, KEY_SPACE, conns)
+    sync_table(Customer, KEY_SPACE, conns)
+    sync_table(Order, KEY_SPACE, conns)
+    sync_table(Item, KEY_SPACE, conns)
+    sync_table(OrderLine, KEY_SPACE, conns)
+    sync_table(Stock, KEY_SPACE, conns)
