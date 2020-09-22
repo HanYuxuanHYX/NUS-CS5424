@@ -2,18 +2,18 @@
 
 ## Setup
 
-# Setup Cassandra & Datastax Python Driver
+### Setup Cassandra & Datastax Python Driver
 https://cassandra.apache.org/doc/latest/getting_started/index.html
 https://docs.datastax.com/en/developer/python-driver/3.24/
 
-# Setup Python Environment
+### Setup Python Environment
 '''
 pip install pipenv
 pipenv shell
 pipenv install
 '''
 
-# Download Data
+### Download Data
 '''
 wget http://www.comp.nus.edu.sg/~cs4224/project-files.zip
 '''
