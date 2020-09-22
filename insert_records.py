@@ -1,13 +1,19 @@
 import csv
-
+from datetime import datetime
 from create_tables import *
 
+
+def parse_date_time(datetime):
+    return datetime.strptime(datetime, '%Y-%m-%d %H:%M:%S.%f')
+
+
 if __name__ == '__main__':
-    connection.setup(IP_ADDRESS, KEY_SPACE)
+    connection.setup(IP_ADDRESS, KEY_SPACE[0])
 
     with open('project-files/data-files/customer.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         for row in reader:
+            row[12] = parse_date_time(row[12])
             args = dict(zip(Customer().keys(), row))
             Customer.create(**args)
 
@@ -15,35 +21,36 @@ if __name__ == '__main__':
         reader = csv.reader(input_file, delimiter=',')
         for row in reader:
             args = dict(zip(District().keys(), row))
-            Customer.create(**args)
+            District.create(**args)
 
     with open('project-files/data-files/item.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         for row in reader:
             args = dict(zip(Item().keys(), row))
-            Customer.create(**args)
+            Item.create(**args)
 
     with open('project-files/data-files/order.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         for row in reader:
+            row[7] = parse_date_time(row[7])
             args = dict(zip(Order().keys(), row))
-            Customer.create(**args)
+            Order.create(**args)
 
     with open('project-files/data-files/order-line.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         for row in reader:
+            row[5] = parse_date_time(row[5])
             args = dict(zip(OrderLine().keys(), row))
-            Customer.create(**args)
+            OrderLine.create(**args)
 
     with open('project-files/data-files/stock.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         for row in reader:
             args = dict(zip(Stock().keys(), row))
-            Customer.create(**args)
+            Stock.create(**args)
 
     with open('project-files/data-files/warehouse.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         for row in reader:
             args = dict(zip(Warehouse().keys(), row))
-            Customer.create(**args)
-
+            Warehouse.create(**args)

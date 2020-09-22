@@ -3,6 +3,8 @@ from cassandra.cqlengine import connection
 from cassandra.cqlengine.management import sync_table, create_keyspace_simple
 from cassandra.cqlengine.models import Model
 
+# IP_ADDRESS = ['127.0.0.1']
+
 IP_ADDRESS = ['192.168.48.174']
 KEY_SPACE = ['ks']
 
