@@ -16,6 +16,7 @@ pipenv install
 ### Download Data
 ```
 wget http://www.comp.nus.edu.sg/~cs4224/project-files.zip
+unzip project-files.zip
 ```
 
 ## Run
