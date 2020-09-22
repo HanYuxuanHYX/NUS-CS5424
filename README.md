@@ -3,7 +3,7 @@
 ## Setup
 
 ### Setup Cassandra & Datastax Python Driver
-https://cassandra.apache.org/doc/latest/getting_started/index.html
+https://cassandra.apache.org/doc/latest/getting_started/index.html <br>
 https://docs.datastax.com/en/developer/python-driver/3.24/
 
 ### Setup Python Environment
