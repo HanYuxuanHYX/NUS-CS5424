@@ -37,21 +37,25 @@ if __name__ == '__main__':
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Orders'
         for row in tqdm(reader):
+            keys = Order().keys()
             if row[4] == 'null':
-                row[4] = ''
+                row.pop(4)
+                keys.pop(4)
             row[7] = parse_date_time(row[7])
-            args = dict(zip(Order().keys(), row))
+            args = dict(zip(keys, row))
             Order.create(**args)
 
     with open('project-files/data-files/order-line.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Order-lines'
         for row in tqdm(reader):
+            keys = Order().keys()
             if row[5] == 'null':
-                row[5] = ''
+                row.pop(5)
+                keys.pop(5)
             else:
                 row[5] = parse_date_time(row[5])
-            args = dict(zip(OrderLine().keys(), row))
+            args = dict(zip(keys, row))
             OrderLine.create(**args)
 
     with open('project-files/data-files/stock.csv') as input_file:
