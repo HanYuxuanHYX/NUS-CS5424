@@ -1,11 +1,11 @@
 import csv
 from tqdm import tqdm
-from datetime import datetime
+import datetime
 from create_tables import *
 
 
 def parse_date_time(time_str):
-    return datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S.%f')
+    return datetime.datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S.%f')
 
 
 if __name__ == '__main__':
@@ -38,7 +38,7 @@ if __name__ == '__main__':
         print 'Loading Orders'
         for row in tqdm(reader):
             if row[4] == 'null':
-                row[4] = 0
+                row[4] = ''
             row[7] = parse_date_time(row[7])
             args = dict(zip(Order().keys(), row))
             Order.create(**args)
@@ -48,7 +48,7 @@ if __name__ == '__main__':
         print 'Loading Order-lines'
         for row in tqdm(reader):
             if row[5] == 'null':
-                row[5] = datetime.time()
+                row[5] = ''
             else:
                 row[5] = parse_date_time(row[5])
             args = dict(zip(OrderLine().keys(), row))
