@@ -15,22 +15,57 @@ if __name__ == '__main__':
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Customers'
         for row in tqdm(reader):
-            row[12] = parse_date_time(row[12])
-            args = dict(zip(Customer().keys(), row))
+            keys = Customer().keys()
+            fields = []
+            values = []
+            for i in range(len(keys)):
+                if row[i] == 'null':
+                    continue
+                else:
+                    fields.append(keys[i])
+                    if isinstance(Customer._columns[keys[i]], columns.DateTime()):
+                        values.append(parse_date_time(row[i]))
+                    else:
+                        values.append(row[i])
+            args = dict(zip(fields, values))
             Customer.create(**args)
 
     with open('project-files/data-files/district.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Districts'
         for row in tqdm(reader):
-            args = dict(zip(District().keys(), row))
+            keys = District().keys()
+            fields = []
+            values = []
+            for i in range(len(keys)):
+                if row[i] == 'null':
+                    continue
+                else:
+                    fields.append(keys[i])
+                    if isinstance(District._columns[keys[i]], columns.DateTime()):
+                        values.append(parse_date_time(row[i]))
+                    else:
+                        values.append(row[i])
+            args = dict(zip(fields, values))
             District.create(**args)
 
     with open('project-files/data-files/item.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Items'
         for row in tqdm(reader):
-            args = dict(zip(Item().keys(), row))
+            keys = Item().keys()
+            fields = []
+            values = []
+            for i in range(len(keys)):
+                if row[i] == 'null':
+                    continue
+                else:
+                    fields.append(keys[i])
+                    if isinstance(Item._columns[keys[i]], columns.DateTime()):
+                        values.append(parse_date_time(row[i]))
+                    else:
+                        values.append(row[i])
+            args = dict(zip(fields, values))
             Item.create(**args)
 
     with open('project-files/data-files/order.csv') as input_file:
@@ -38,36 +73,73 @@ if __name__ == '__main__':
         print 'Loading Orders'
         for row in tqdm(reader):
             keys = Order().keys()
-            if row[4] == 'null':
-                row.pop(4)
-                keys.pop(4)
-            row[7] = parse_date_time(row[7])
-            args = dict(zip(keys, row))
+            fields = []
+            values = []
+            for i in range(len(keys)):
+                if row[i] == 'null':
+                    continue
+                else:
+                    fields.append(keys[i])
+                    if isinstance(Order._columns[keys[i]], columns.DateTime()):
+                        values.append(parse_date_time(row[i]))
+                    else:
+                        values.append(row[i])
+            args = dict(zip(fields, values))
             Order.create(**args)
 
     with open('project-files/data-files/order-line.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Order-lines'
         for row in tqdm(reader):
-            keys = Order().keys()
-            if row[5] == 'null':
-                row.pop(5)
-                keys.pop(5)
-            else:
-                row[5] = parse_date_time(row[5])
-            args = dict(zip(keys, row))
+            keys = OrderLine().keys()
+            fields = []
+            values = []
+            for i in range(len(keys)):
+                if row[i] == 'null':
+                    continue
+                else:
+                    fields.append(keys[i])
+                    if isinstance(OrderLine._columns[keys[i]], columns.DateTime()):
+                        values.append(parse_date_time(row[i]))
+                    else:
+                        values.append(row[i])
+            args = dict(zip(fields, values))
             OrderLine.create(**args)
 
     with open('project-files/data-files/stock.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Stocks'
         for row in tqdm(reader):
-            args = dict(zip(Stock().keys(), row))
+            keys = Stock().keys()
+            fields = []
+            values = []
+            for i in range(len(keys)):
+                if row[i] == 'null':
+                    continue
+                else:
+                    fields.append(keys[i])
+                    if isinstance(Stock._columns[keys[i]], columns.DateTime()):
+                        values.append(parse_date_time(row[i]))
+                    else:
+                        values.append(row[i])
+            args = dict(zip(fields, values))
             Stock.create(**args)
 
     with open('project-files/data-files/warehouse.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Warehouses'
         for row in tqdm(reader):
-            args = dict(zip(Warehouse().keys(), row))
+            keys = Warehouse().keys()
+            fields = []
+            values = []
+            for i in range(len(keys)):
+                if row[i] == 'null':
+                    continue
+                else:
+                    fields.append(keys[i])
+                    if isinstance(Warehouse._columns[keys[i]], columns.DateTime()):
+                        values.append(parse_date_time(row[i]))
+                    else:
+                        values.append(row[i])
+            args = dict(zip(fields, values))
             Warehouse.create(**args)
