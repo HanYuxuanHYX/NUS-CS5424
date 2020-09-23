@@ -4,8 +4,8 @@ from datetime import datetime
 from create_tables import *
 
 
-def parse_date_time(datetime):
-    return datetime.strptime(datetime, '%Y-%m-%d %H:%M:%S.%f')
+def parse_date_time(time_str):
+    return datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S.%f')
 
 
 if __name__ == '__main__':
@@ -37,6 +37,8 @@ if __name__ == '__main__':
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Orders'
         for row in tqdm(reader):
+            if row[4] == 'null':
+                row[4] = 0
             row[7] = parse_date_time(row[7])
             args = dict(zip(Order().keys(), row))
             Order.create(**args)
@@ -45,7 +47,10 @@ if __name__ == '__main__':
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Order-lines'
         for row in tqdm(reader):
-            row[5] = parse_date_time(row[5])
+            if row[5] == 'null':
+                row[5] = datetime.time()
+            else:
+                row[5] = parse_date_time(row[5])
             args = dict(zip(OrderLine().keys(), row))
             OrderLine.create(**args)
 
