@@ -1,7 +1,6 @@
 import csv
 from tqdm import tqdm
 import datetime
-from cassandra.cqlengine.query import BatchQuery
 from create_tables import *
 
 
@@ -16,7 +15,6 @@ if __name__ == '__main__':
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Customers'
 
-        b = BatchQuery()
         for row in tqdm(reader):
             keys = Customer().keys()
             fields = []
@@ -31,14 +29,12 @@ if __name__ == '__main__':
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Customer.batch(b).create(**args)
-        b.execute()
+            Customer.create(**args)
 
     with open('project-files/data-files/district.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Districts'
 
-        b = BatchQuery()
         for row in tqdm(reader):
             keys = District().keys()
             fields = []
@@ -53,14 +49,12 @@ if __name__ == '__main__':
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            District.batch(b).create(**args)
-        b.execute()
+            District.create(**args)
 
     with open('project-files/data-files/item.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Items'
 
-        b = BatchQuery()
         for row in tqdm(reader):
             keys = Item().keys()
             fields = []
@@ -75,14 +69,12 @@ if __name__ == '__main__':
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Item.batch(b).create(**args)
-        b.execute()
+            Item.create(**args)
 
     with open('project-files/data-files/order.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Orders'
 
-        b = BatchQuery()
         for row in tqdm(reader):
             keys = Order().keys()
             fields = []
@@ -97,14 +89,12 @@ if __name__ == '__main__':
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Order.batch(b).create(**args)
-        b.execute()
+            Order.create(**args)
 
     with open('project-files/data-files/order-line.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Order-lines'
 
-        b = BatchQuery()
         for row in tqdm(reader):
             keys = OrderLine().keys()
             fields = []
@@ -119,14 +109,12 @@ if __name__ == '__main__':
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            OrderLine.batch(b).create(**args)
-        b.execute()
+            OrderLine.create(**args)
 
     with open('project-files/data-files/stock.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Stocks'
 
-        b = BatchQuery()
         for row in tqdm(reader):
             keys = Stock().keys()
             fields = []
@@ -141,14 +129,12 @@ if __name__ == '__main__':
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Stock.batch(b).create(**args)
-        b.execute()
+            Stock.create(**args)
 
     with open('project-files/data-files/warehouse.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Warehouses'
 
-        b = BatchQuery()
         for row in tqdm(reader):
             keys = Warehouse().keys()
             fields = []
@@ -163,5 +149,4 @@ if __name__ == '__main__':
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Warehouse.batch(b).create(**args)
-        b.execute()
+            Warehouse.create(**args)
