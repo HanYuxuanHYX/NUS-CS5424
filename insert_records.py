@@ -1,6 +1,7 @@
 import csv
 from tqdm import tqdm
 import datetime
+from cassandra.cqlengine.query import BatchQuery
 from create_tables import *
 
 
@@ -14,6 +15,8 @@ if __name__ == '__main__':
     with open('project-files/data-files/customer.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Customers'
+
+        b = BatchQuery()
         for row in tqdm(reader):
             keys = Customer().keys()
             fields = []
@@ -23,16 +26,19 @@ if __name__ == '__main__':
                     continue
                 else:
                     fields.append(keys[i])
-                    if isinstance(Customer._columns[keys[i]], columns.DateTime()):
+                    if isinstance(Customer._columns[keys[i]], columns.DateTime):
                         values.append(parse_date_time(row[i]))
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Customer.create(**args)
+            Customer.batch(b).create(**args)
+        b.execute()
 
     with open('project-files/data-files/district.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Districts'
+
+        b = BatchQuery()
         for row in tqdm(reader):
             keys = District().keys()
             fields = []
@@ -42,16 +48,19 @@ if __name__ == '__main__':
                     continue
                 else:
                     fields.append(keys[i])
-                    if isinstance(District._columns[keys[i]], columns.DateTime()):
+                    if isinstance(District._columns[keys[i]], columns.DateTime):
                         values.append(parse_date_time(row[i]))
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            District.create(**args)
+            District.batch(b).create(**args)
+        b.execute()
 
     with open('project-files/data-files/item.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Items'
+
+        b = BatchQuery()
         for row in tqdm(reader):
             keys = Item().keys()
             fields = []
@@ -61,16 +70,19 @@ if __name__ == '__main__':
                     continue
                 else:
                     fields.append(keys[i])
-                    if isinstance(Item._columns[keys[i]], columns.DateTime()):
+                    if isinstance(Item._columns[keys[i]], columns.DateTime):
                         values.append(parse_date_time(row[i]))
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Item.create(**args)
+            Item.batch(b).create(**args)
+        b.execute()
 
     with open('project-files/data-files/order.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Orders'
+
+        b = BatchQuery()
         for row in tqdm(reader):
             keys = Order().keys()
             fields = []
@@ -80,16 +92,19 @@ if __name__ == '__main__':
                     continue
                 else:
                     fields.append(keys[i])
-                    if isinstance(Order._columns[keys[i]], columns.DateTime()):
+                    if isinstance(Order._columns[keys[i]], columns.DateTime):
                         values.append(parse_date_time(row[i]))
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Order.create(**args)
+            Order.batch(b).create(**args)
+        b.execute()
 
     with open('project-files/data-files/order-line.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Order-lines'
+
+        b = BatchQuery()
         for row in tqdm(reader):
             keys = OrderLine().keys()
             fields = []
@@ -99,16 +114,19 @@ if __name__ == '__main__':
                     continue
                 else:
                     fields.append(keys[i])
-                    if isinstance(OrderLine._columns[keys[i]], columns.DateTime()):
+                    if isinstance(OrderLine._columns[keys[i]], columns.DateTime):
                         values.append(parse_date_time(row[i]))
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            OrderLine.create(**args)
+            OrderLine.batch(b).create(**args)
+        b.execute()
 
     with open('project-files/data-files/stock.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Stocks'
+
+        b = BatchQuery()
         for row in tqdm(reader):
             keys = Stock().keys()
             fields = []
@@ -118,16 +136,19 @@ if __name__ == '__main__':
                     continue
                 else:
                     fields.append(keys[i])
-                    if isinstance(Stock._columns[keys[i]], columns.DateTime()):
+                    if isinstance(Stock._columns[keys[i]], columns.DateTime):
                         values.append(parse_date_time(row[i]))
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Stock.create(**args)
+            Stock.batch(b).create(**args)
+        b.execute()
 
     with open('project-files/data-files/warehouse.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
         print 'Loading Warehouses'
+
+        b = BatchQuery()
         for row in tqdm(reader):
             keys = Warehouse().keys()
             fields = []
@@ -137,9 +158,10 @@ if __name__ == '__main__':
                     continue
                 else:
                     fields.append(keys[i])
-                    if isinstance(Warehouse._columns[keys[i]], columns.DateTime()):
+                    if isinstance(Warehouse._columns[keys[i]], columns.DateTime):
                         values.append(parse_date_time(row[i]))
                     else:
                         values.append(row[i])
             args = dict(zip(fields, values))
-            Warehouse.create(**args)
+            Warehouse.batch(b).create(**args)
+        b.execute()
