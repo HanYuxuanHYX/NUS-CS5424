@@ -3,9 +3,9 @@ from cassandra.cqlengine import connection
 from cassandra.cqlengine.management import sync_table, create_keyspace_simple
 from cassandra.cqlengine.models import Model
 
-# IP_ADDRESS = ['127.0.0.1']
+IP_ADDRESS = ['127.0.0.1']
 
-IP_ADDRESS = ['192.168.48.174']
+# IP_ADDRESS = ['192.168.48.174']
 KEY_SPACE = ['ks']
 
 
@@ -22,7 +22,7 @@ class Warehouse(Model):
 
 
 class District(Model):
-    D_W_ID = columns.Integer()
+    D_W_ID = columns.Integer(primary_key=True)
     D_ID = columns.Integer(primary_key=True)
     D_NAME = columns.Text(max_length=10)
     D_STREET1 = columns.Text(max_length=20)
@@ -36,8 +36,8 @@ class District(Model):
 
 
 class Customer(Model):
-    C_W_ID = columns.Integer()
-    C_D_ID = columns.Integer()
+    C_W_ID = columns.Integer(primary_key=True)
+    C_D_ID = columns.Integer(primary_key=True)
     C_ID = columns.Integer(primary_key=True)
     C_FIRST = columns.Text(max_length=16)
     C_MIDDLE = columns.Text(max_length=2)
@@ -60,8 +60,8 @@ class Customer(Model):
 
 
 class Order(Model):
-    O_W_ID = columns.Integer()
-    O_D_ID = columns.Integer()
+    O_W_ID = columns.Integer(primary_key=True)
+    O_D_ID = columns.Integer(primary_key=True)
     O_C_ID = columns.Integer()
     O_ID = columns.Integer(primary_key=True)
     O_CARRIER_ID = columns.Integer(required=False)
@@ -79,9 +79,9 @@ class Item(Model):
 
 
 class OrderLine(Model):
-    OL_W_ID = columns.Integer()
-    OL_D_ID = columns.Integer()
-    OL_O_ID = columns.Integer()
+    OL_W_ID = columns.Integer(primary_key=True)
+    OL_D_ID = columns.Integer(primary_key=True)
+    OL_O_ID = columns.Integer(primary_key=True)
     OL_NUMBER = columns.Integer(primary_key=True)
     OL_I_ID = columns.Integer()
     OL_DELIVERY_D = columns.DateTime(required=False)
@@ -93,7 +93,7 @@ class OrderLine(Model):
 
 class Stock(Model):
     S_W_ID = columns.Integer(primary_key=True)
-    S_D_ID = columns.Integer(primary_key=True)
+    S_I_ID = columns.Integer(primary_key=True)
     S_QUANTITY = columns.Decimal()
     S_YTD = columns.Decimal()
     S_ORDER_CNT = columns.Integer()
