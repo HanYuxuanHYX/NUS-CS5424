@@ -11,7 +11,7 @@ def new_order_transaction(w_id, d_id, c_id, num_items, item_num, supplier_wareho
 
     n = district.D_NEXT_O_ID
 
-    district.D_NEXT_O_ID = n + 1
+    district.update(D_NEXT_O_ID=n + 1)
 
     entry_time = datetime.utcnow()
     local = all([w_id == i for i in supplier_warehouse])
@@ -26,11 +26,11 @@ def new_order_transaction(w_id, d_id, c_id, num_items, item_num, supplier_wareho
         adjusted_qty = stock.S_QUANTITY - quantity[i]
         if adjusted_qty < 10:
             adjusted_qty += 100
-        stock.S_QUANTITY = adjusted_qty
-        stock.S_YTD += quantity[i]
-        stock.S_ORDER_CNT += 1
+        stock.update(S_QUANTITY=adjusted_qty)
+        stock.update(S_YTD=stock.S_YTD + quantity[i])
+        stock.update(S_ORDER_CNT=stock.S_ORDER_CNT + 1)
         if supplier_warehouse[i] != w_id:
-            stock.S_REMOTE_CNT += 1
+            stock.update(S_REMOTE_CNT=stock.S_REMOTE_CNT + 1)
         item_amount = quantity[i] * item.I_PRICE
         total_amount += item_amount
         d_id_string = str(d_id) if d_id >= 10 else '0' + str(d_id)
