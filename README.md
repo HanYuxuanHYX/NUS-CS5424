@@ -19,10 +19,11 @@ wget http://www.comp.nus.edu.sg/~cs4224/project-files.zip
 unzip project-files.zip
 ```
 
-## Run
+## Preparation
 First, start Cassandra.
-Then, create tables & insert rows:
+Then, create tables, materialized views & insert rows:
 ```
 python create_tables.py
+python create_materialized_views.py
 python insert_records.py
 ```
