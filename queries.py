@@ -34,7 +34,7 @@ def new_order_transaction(w_id, d_id, c_id, num_items, item_num, supplier_wareho
         item_amount = quantity[i] * item.I_PRICE
         total_amount += item_amount
         d_id_string = str(d_id) if d_id >= 10 else '0' + str(d_id)
-        dist_info = getattr(stock, 'S_DIST' + d_id_string)
+        dist_info = getattr(stock, 'S_DIST_' + d_id_string)
         OrderLine.create(OL_O_ID=n, OL_D_ID=d_id, OL_W_ID=w_id, OL_NUMBER=i, OL_I_ID=item_num[i],
                          OL_SUPPLY_W_ID=supplier_warehouse[i], OL_QUANTITY=quantity[i], OL_AMOUNT=item_amount,
                          OL_DIST_INFO=dist_info)
@@ -42,18 +42,18 @@ def new_order_transaction(w_id, d_id, c_id, num_items, item_num, supplier_wareho
 
     # Output
 
-    print('customer identifier:', w_id, d_id, c_id, ', last name:', customer.C_LAST, ', credit:', customer.C_CREDIT,
-          ', discount:', customer.C_DISCOUNT)
-    print('warehouse tax rate:', warehouse.W_TAX, ', district tax rate:', district.D_TAX)
-    print('order number:', n, ', entry date:', entry_time)
-    print('number of items:', num_items, ', total amount:', total_amount)
+    print 'customer identifier:', w_id, d_id, c_id, ', last name:', customer.C_LAST, ', credit:', customer.C_CREDIT, ', discount:', customer.C_DISCOUNT
+    print 'warehouse tax rate:', warehouse.W_TAX, ', district tax rate:', district.D_TAX
+    print 'order number:', n, ', entry date:', entry_time
+    print 'number of items:', num_items, ', total amount:', total_amount
     for i in range(num_items):
         item = Item.objects.filter(I_ID=item_num[i]).get()
         stock = Stock.objects.filter(S_W_ID=w_id, S_I_ID=item_num[i]).get()
         orderLine = OrderLine.objects.filter(OL_O_ID=n, OL_D_ID=d_id, OL_W_ID=w_id, OL_NUMBER=i).get()
-        print('item number:', item_num[i], ', item name:', item.I_NAME, ', supplier warehouse:', supplier_warehouse[i],
-              ', quantity:', quantity[i], ', amount:', orderLine.OL_AMOUNT, ', stock quantity:', stock.S_QUANTITY)
+        print 'item number:', item_num[i], ', item name:', item.I_NAME, ', supplier warehouse:', supplier_warehouse[
+            i], ', quantity:', quantity[i], ', amount:', orderLine.OL_AMOUNT, ', stock quantity:', stock.S_QUANTITY
 
 
 if __name__ == '__main__':
+    connection.setup(IP_ADDRESS, KEY_SPACE[0])
     new_order_transaction(1, 1, 1279, 2, [68195, 26567], [1, 1], [1, 5])
