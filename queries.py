@@ -58,6 +58,7 @@ def popular_item_transaction(w_id, d_id, last):
     # Processing steps
 
     orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id)[-last:]
+    popular_list = []
     for order in orders:
         order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID)
         max_qty = 0
@@ -68,20 +69,21 @@ def popular_item_transaction(w_id, d_id, last):
                 popular_ols = [order_line.OL_NUMBER]
             elif order_line.OL_QUANTITY == max_qty:
                 popular_ols.append(order_line.OL_NUMBER)
+        popular_list.append(popular_ols)
 
     # Output
 
     print 'district identifier:', w_id, d_id
     print 'number of last orders to be examined:', last
-    for order in orders:
+    popular_items = set()
+    for order, popular_ols in zip(orders, popular_list):
         print 'order number:', order.O_ID, ', entry date and time:', order.O_ENTRY_D
         customer = Customer.filter(C_W_ID=w_id, C_D_ID=d_id, C_ID=order.O_C_ID).get()
         print 'name of the customer who placed this order:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST
-        popular_items = set()
         for popular_ol in popular_ols:
             order_line = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID, OL_NUMBER=popular_ol).get()
             item = Item.filter(I_ID=order_line.OL_I_ID).get()
-            print 'item name:', item.I_NAME, ', quantity ordered:', order_line.OL_QUANTITY
+            print '\titem name:', item.I_NAME, ', quantity ordered:', order_line.OL_QUANTITY
             popular_items.add(item)
     for popular_item in popular_items:
         print 'item name:', popular_item.I_NAME
