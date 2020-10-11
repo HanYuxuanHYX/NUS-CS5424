@@ -94,9 +94,10 @@ def popular_item_transaction(w_id, d_id, last):
                 if order_line.OL_I_ID == popular_item.I_ID:
                     count += 1
                     break
-        print 'percentage of orders that contain this item:', (count / last) * 100
+        print 'percentage of orders that contain this item:', (count / float(last)) * 100
 
 
 if __name__ == '__main__':
     connection.setup(IP_ADDRESS, KEY_SPACE[0])
-    new_order_transaction(1, 1, 1279, 2, [68195, 26567], [1, 1], [1, 5])
+    popular_item_transaction(1, 1, 50)
+    # new_order_transaction(1, 1, 1279, 2, [68195, 26567], [1, 1], [1, 5])
