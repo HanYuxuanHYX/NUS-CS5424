@@ -180,6 +180,21 @@ def stock_level_transaction(w_id, d_id, threshold, last):
     print 'total number of items in S where its stock quantity at W_ID is below the threshold:', total_number
 
 
+def top_balance_transaction():
+    # Processing steps:
+    C = session.execute("SELECT * FROM customer_sort_by_balance LIMIT 10")
+
+    # Output
+    for customer in C:
+        print "name of the customer:", customer['C_FIRST'], customer['C_MIDDLE'], customer['C_LAST']
+        print "balance of the customer's outstanding payment:", customer['C_BALANCE']
+
+        warehouse = Warehouse.filter(W_ID=customer['C_W_ID']).get()
+        district = District.filter(W_ID=customer['C_W_ID'], D_ID=customer['C_D_ID']).get()
+        print 'warehouse name of customer:', warehouse.W_NAME
+        print 'district name of customer:', district.D_NAME
+
+
 if __name__ == '__main__':
     cluster = Cluster(IP_ADDRESS)
     session = cluster.connect(KEY_SPACE[0])
