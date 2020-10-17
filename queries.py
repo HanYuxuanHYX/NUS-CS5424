@@ -181,7 +181,9 @@ def stock_level_transaction(w_id, d_id, threshold, last):
 
 
 if __name__ == '__main__':
-    connection.setup(IP_ADDRESS, KEY_SPACE[0])
+    cluster = Cluster(IP_ADDRESS)
+    session = cluster.connect(KEY_SPACE[0])
+    set_session(session)
     popular_item_transaction(1, 1, 50)
     # new_order_transaction(1, 1, 1279, 2, [68195, 26567], [1, 1], [1, 5])
     # payment_transaction(1, 1, 1, 20000.8)
