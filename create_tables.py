@@ -1,7 +1,9 @@
+from cassandra.cluster import Cluster
 from cassandra.cqlengine import columns
 from cassandra.cqlengine import connection
 from cassandra.cqlengine.management import sync_table, create_keyspace_simple
 from cassandra.cqlengine.models import Model
+from cassandra.cqlengine.connection import set_session
 
 # IP_ADDRESS = ['127.0.0.1']
 
