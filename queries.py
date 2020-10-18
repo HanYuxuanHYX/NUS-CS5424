@@ -96,8 +96,8 @@ def popular_item_transaction(w_id, d_id, last):
                     count += 1
                     break
         print 'percentage of orders that contain this item:', (count / float(last)) * 100
-        
-        
+
+
 def payment_transaction(c_w_id, c_d_id, c_id, payment):
     warehouse = Warehouse.filter(W_ID=c_w_id).get()
     district = District.filter(D_W_ID=c_w_id, D_ID=c_d_id).get()
@@ -130,7 +130,7 @@ def delivery_transaction(w_id, carrier_id):
         print(orders)
         n = 99999999
         for order in orders:
-            if order.O_CARRIER_ID==None:
+            if order.O_CARRIER_ID == None:
                 if order.O_ID < n:
                     n = order.O_ID
                     print(order)
@@ -149,8 +149,9 @@ def delivery_transaction(w_id, carrier_id):
             print(order_line.OL_AMOUNT)
             print(order_line.OL_DELIVERY_D)
         print(b)
-        c.update(C_BALANCE=c.C_BALANCE+b)
-        c.update(C_DELIVERY_CNT=c.C_DELIVERY_CNT+1)
+        c.update(C_BALANCE=c.C_BALANCE + b)
+        c.update(C_DELIVERY_CNT=c.C_DELIVERY_CNT + 1)
+
 
 def order_status_transaction(c_w_id, c_d_id, c_id):
     customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
@@ -158,7 +159,7 @@ def order_status_transaction(c_w_id, c_d_id, c_id):
     # Output
     print 'customer name:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST, ', balance:', customer.C_BALANCE
     orders = Order.filter(O_W_ID=c_w_id, O_D_ID=c_d_id)
-    k=0
+    k = 0
     for order in orders:
         if order.O_ID > k:
             k = order.O_ID
@@ -166,6 +167,7 @@ def order_status_transaction(c_w_id, c_d_id, c_id):
     orderLines = OrderLine.filter(OL_W_ID=c_w_id, OL_D_ID=c_d_id, OL_O_ID=order.O_ID)
     for orderLine in orderLines:
         print 'item number:', orderLine.OL_I_ID, ',supplying warehouse number:', orderLine.OL_SUPPLY_W_ID, 'quantity ordered:', orderLine.OL_QUANTITY, 'total price for ordered item:', orderLine.OL_AMOUNT, 'data and time of delivery:', orderLine.OL_DELIVERY_D
+
 
 def stock_level_transaction(w_id, d_id, threshold, last):
     # Processing steps
@@ -176,7 +178,7 @@ def stock_level_transaction(w_id, d_id, threshold, last):
     for orderLine in orderLines:
         stock = Stock.filter(S_W_ID=w_id, S_I_ID=orderLine.OL_I_ID).get()
         if stock.S_QUANTITY < threshold:
-            total_number = total_number+1
+            total_number = total_number + 1
     print 'total number of items in S where its stock quantity at W_ID is below the threshold:', total_number
 
 
@@ -193,6 +195,24 @@ def top_balance_transaction():
         district = District.filter(W_ID=customer['C_W_ID'], D_ID=customer['C_D_ID']).get()
         print 'warehouse name of customer:', warehouse.W_NAME
         print 'district name of customer:', district.D_NAME
+
+
+def related_customer_transaction(w_id, d_id, c_id):
+    # Processing steps:
+    c_orders = session.execute(
+        """
+        SELECT * from order_by_customer
+        WHERE O_W_ID=%s AND O_D_ID=%s AND O_C_ID=%s
+        """,
+        (w_id, d_id, c_id)
+    )
+
+    warehouses = Warehouse.all()
+    w_id_set = set()
+    for warehouse in warehouses:
+        w_id_set.add(warehouse.W_ID)
+    w_id_set.remove(w_id)
+    orders = Order.filter(O_W_ID__in=w_id_set)
 
 
 if __name__ == '__main__':
