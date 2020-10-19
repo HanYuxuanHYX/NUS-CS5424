@@ -165,19 +165,19 @@ def stock_level_transaction(w_id, d_id, threshold, last):
     print 'total number of items in S where its stock quantity at W_ID is below the threshold:', total_number
 
 
-def top_balance_transaction():
-    # Processing steps:
-    C = session.execute("SELECT * FROM customer_sort_by_balance LIMIT 10")
-
-    # Output
-    for customer in C:
-        print "name of the customer:", customer['C_FIRST'], customer['C_MIDDLE'], customer['C_LAST']
-        print "balance of the customer's outstanding payment:", customer['C_BALANCE']
-
-        warehouse = Warehouse.filter(W_ID=customer['C_W_ID']).get()
-        district = District.filter(W_ID=customer['C_W_ID'], D_ID=customer['C_D_ID']).get()
-        print 'warehouse name of customer:', warehouse.W_NAME
-        print 'district name of customer:', district.D_NAME
+# def top_balance_transaction():
+#     # Processing steps:
+#     C = session.execute("SELECT * FROM customer_sort_by_balance LIMIT 10")
+#
+#     # Output
+#     for customer in C:
+#         print "name of the customer:", customer['C_FIRST'], customer['C_MIDDLE'], customer['C_LAST']
+#         print "balance of the customer's outstanding payment:", customer['C_BALANCE']
+#
+#         warehouse = Warehouse.filter(W_ID=customer['C_W_ID']).get()
+#         district = District.filter(W_ID=customer['C_W_ID'], D_ID=customer['C_D_ID']).get()
+#         print 'warehouse name of customer:', warehouse.W_NAME
+#         print 'district name of customer:', district.D_NAME
 
 
 def related_customer_transaction(w_id, d_id, c_id):
@@ -190,6 +190,26 @@ def related_customer_transaction(w_id, d_id, c_id):
         w_id_set.add(warehouse.W_ID)
     w_id_set.remove(w_id)
     orders = Order.filter(O_W_ID__in=w_id_set)
+
+    related_customers = set()
+    for c_order in c_orders:
+        c_order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=c_order.O_ID)
+        c_items = set()
+        for c_order_line in c_order_lines:
+            c_items.add(c_order_line.OL_I_ID)
+
+        for order in orders:
+            items = set()
+            order_lines = OrderLine.filter(OL_W_ID=order.O_W_ID, OL_D_ID=order.O_D_ID, OL_O_ID=order.O_ID)
+            for order_line in order_lines:
+                items.add(order_line.OL_I_ID)
+            if len(c_items.intersection(items)) >= 2:
+                related_customers.add((order.O_W_ID, order.O_D_ID, order.O_C_ID))
+
+    # Output
+    print "customer identifier:", w_id, d_id, c_id
+    for related_customer in related_customers:
+        print "\trelated customer identifier:", related_customer
 
 
 if __name__ == '__main__':

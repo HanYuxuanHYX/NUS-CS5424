@@ -28,20 +28,18 @@ if __name__ == '__main__':
         print 'Loading Customers'
 
         for row in tqdm(reader):
-            keys = Customer().keys()
-            fields = []
-            values = []
-            for i in range(len(keys)):
-                if row[i] == 'null':
-                    continue
-                else:
-                    fields.append(keys[i])
-                    if isinstance(Customer._columns[keys[i]], columns.DateTime):
-                        values.append(parse_date_time(row[i]))
-                    else:
-                        values.append(row[i])
-            args = dict(zip(fields, values))
-            Customer.create(**args)
+            customer_keys = Customer().keys()
+            balance_keys = CustomerByBalance.keys()
+
+            customer_values = row
+            customer_values.pop(-5)
+            customer_values[-8] = parse_date_time(customer_values[-8])
+            balance_values = row[0:3] + row[-5]
+
+            customer_args = dict(zip(customer_keys, customer_values))
+            Customer.create(**customer_args)
+            balance_args = dict(zip(balance_keys, balance_values))
+            CustomerByBalance.create(**balance_args)
 
     with open('project-files/data-files/district.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
