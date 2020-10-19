@@ -1,9 +1,11 @@
 from create_tables import IP_ADDRESS, KEY_SPACE
+from cassandra import ConsistencyLevel
 from cassandra.cluster import Cluster
 
 cluster = Cluster(IP_ADDRESS)
 session = cluster.connect(KEY_SPACE[0])
-
+session.default_timeout = 5000
+session.default_consistency_level = ConsistencyLevel.ALL
 session.execute(
     """
         CREATE MATERIALIZED VIEW order_by_customer
@@ -25,4 +27,5 @@ session.execute(
         WITH CLUSTERING ORDER BY ("C_BALANCE" DESC);
     """
 )
+
 

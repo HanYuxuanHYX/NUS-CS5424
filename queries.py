@@ -127,18 +127,12 @@ def delivery_transaction(w_id, carrier_id):
 
     for district_no in range(1, 11):
         orders = Order.filter(O_W_ID=w_id, O_D_ID=district_no)
-        print(orders)
-        n = 99999999
         for order in orders:
-            if order.O_CARRIER_ID == None:
-                if order.O_ID < n:
-                    n = order.O_ID
-                    print(order)
+            if order.O_CARRIER_ID is None:
+                n = order.O_ID
+                break
         x = Order.filter(O_W_ID=w_id, O_D_ID=district_no, O_ID=n).get()
-        print('hhhhhhh')
-        print (x)
         c = Customer.filter(C_W_ID=w_id, C_D_ID=district_no, C_ID=x.O_C_ID).get()
-        print c
         x.update(O_CARRIER_ID=carrier_id)
         order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=district_no, OL_O_ID=n)
         b = 0
@@ -148,7 +142,6 @@ def delivery_transaction(w_id, carrier_id):
             print(order_line)
             print(order_line.OL_AMOUNT)
             print(order_line.OL_DELIVERY_D)
-        print(b)
         c.update(C_BALANCE=c.C_BALANCE + b)
         c.update(C_DELIVERY_CNT=c.C_DELIVERY_CNT + 1)
 
@@ -158,11 +151,7 @@ def order_status_transaction(c_w_id, c_d_id, c_id):
 
     # Output
     print 'customer name:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST, ', balance:', customer.C_BALANCE
-    orders = Order.filter(O_W_ID=c_w_id, O_D_ID=c_d_id)
-    k = 0
-    for order in orders:
-        if order.O_ID > k:
-            k = order.O_ID
+    order = Order.filter(O_W_ID=c_w_id, O_D_ID=c_d_id, O_C_ID=c_id)[-1]
     print 'order number:', order.O_ID, ', entry date and time:', order.O_ENTRY_D, ', carrier identifier:', order.O_CARRIER_ID
     orderLines = OrderLine.filter(OL_W_ID=c_w_id, OL_D_ID=c_d_id, OL_O_ID=order.O_ID)
     for orderLine in orderLines:
@@ -172,7 +161,6 @@ def order_status_transaction(c_w_id, c_d_id, c_id):
 def stock_level_transaction(w_id, d_id, threshold, last):
     # Processing steps
 
-    district = District.filter(D_W_ID=w_id, D_ID=d_id).get()
     orderLines = OrderLine.filter(OL_D_ID=d_id, OL_W_ID=w_id)[-last:]
     total_number = 0
     for orderLine in orderLines:

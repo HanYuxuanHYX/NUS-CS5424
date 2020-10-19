@@ -24,8 +24,8 @@ class Warehouse(Model):
 
 
 class District(Model):
-    D_W_ID = columns.Integer(primary_key=True)
-    D_ID = columns.Integer(primary_key=True)
+    D_W_ID = columns.Integer(partition_key=True)
+    D_ID = columns.Integer(partition_key=True)
     D_NAME = columns.Text(max_length=10)
     D_STREET1 = columns.Text(max_length=20)
     D_STREET2 = columns.Text(max_length=20)
@@ -38,9 +38,9 @@ class District(Model):
 
 
 class Customer(Model):
-    C_W_ID = columns.Integer(primary_key=True)
-    C_D_ID = columns.Integer(primary_key=True)
-    C_ID = columns.Integer(primary_key=True)
+    C_W_ID = columns.Integer(partition_key=True)
+    C_D_ID = columns.Integer(partition_key=True)
+    C_ID = columns.Integer(partition_key=True)
     C_FIRST = columns.Text(max_length=16)
     C_MIDDLE = columns.Text(max_length=2)
     C_LAST = columns.Text(max_length=16)
@@ -62,11 +62,11 @@ class Customer(Model):
 
 
 class Order(Model):
-    O_W_ID = columns.Integer(primary_key=True)
-    O_D_ID = columns.Integer(primary_key=True)
-    O_C_ID = columns.Integer()
+    O_W_ID = columns.Integer(partition_key=True)
+    O_D_ID = columns.Integer(partition_key=True)
+    O_C_ID = columns.Integer(index=True)
     O_ID = columns.Integer(primary_key=True)
-    O_CARRIER_ID = columns.Integer(required=False)
+    O_CARRIER_ID = columns.Integer()
     O_OL_CNT = columns.Decimal()
     O_ALL_LOCAL = columns.Integer()
     O_ENTRY_D = columns.DateTime()
@@ -81,8 +81,8 @@ class Item(Model):
 
 
 class OrderLine(Model):
-    OL_W_ID = columns.Integer(primary_key=True)
-    OL_D_ID = columns.Integer(primary_key=True)
+    OL_W_ID = columns.Integer(partition_key=True)
+    OL_D_ID = columns.Integer(partition_key=True)
     OL_O_ID = columns.Integer(primary_key=True)
     OL_NUMBER = columns.Integer(primary_key=True)
     OL_I_ID = columns.Integer()
@@ -94,8 +94,8 @@ class OrderLine(Model):
 
 
 class Stock(Model):
-    S_W_ID = columns.Integer(primary_key=True)
-    S_I_ID = columns.Integer(primary_key=True)
+    S_W_ID = columns.Integer(partition_key=True)
+    S_I_ID = columns.Integer(partition_key=True)
     S_QUANTITY = columns.Decimal()
     S_YTD = columns.Decimal()
     S_ORDER_CNT = columns.Integer()
