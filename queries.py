@@ -103,8 +103,6 @@ def payment_transaction(c_w_id, c_d_id, c_id, payment):
     district = District.filter(D_W_ID=c_w_id, D_ID=c_d_id).get()
     customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
     payment_dec = decimal.Decimal(payment)
-    print(warehouse)
-    print (customer)
 
     # Processing steps
 
@@ -139,9 +137,6 @@ def delivery_transaction(w_id, carrier_id):
         for order_line in order_lines:
             order_line.update(OL_DELIVERY_D=datetime.utcnow())
             b = b + order_line.OL_AMOUNT
-            print(order_line)
-            print(order_line.OL_AMOUNT)
-            print(order_line.OL_DELIVERY_D)
         c.update(C_BALANCE=c.C_BALANCE + b)
         c.update(C_DELIVERY_CNT=c.C_DELIVERY_CNT + 1)
 
