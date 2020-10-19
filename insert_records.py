@@ -1,7 +1,3 @@
-from cassandra.cluster import Cluster, ExecutionProfile, EXEC_PROFILE_DEFAULT
-from cassandra.policies import WhiteListRoundRobinPolicy, DowngradingConsistencyRetryPolicy
-from cassandra.query import tuple_factory
-from cassandra import ConsistencyLevel
 from create_tables import *
 
 import csv
@@ -15,13 +11,7 @@ def parse_date_time(time_str):
 
 if __name__ == '__main__':
 
-    profile = ExecutionProfile(
-        consistency_level=ConsistencyLevel.THREE,
-        request_timeout=30,
-    )
-    cluster = Cluster(IP_ADDRESS, execution_profiles={EXEC_PROFILE_DEFAULT: profile})
-    session = cluster.connect(KEY_SPACE[0])
-    set_session(session)
+    connection.setup(IP_ADDRESS, KEY_SPACE[0])
 
     with open('project-files/data-files/customer.csv') as input_file:
         reader = csv.reader(input_file, delimiter=',')
