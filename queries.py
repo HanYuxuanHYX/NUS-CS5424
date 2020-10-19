@@ -187,13 +187,7 @@ def top_balance_transaction():
 
 def related_customer_transaction(w_id, d_id, c_id):
     # Processing steps:
-    c_orders = session.execute(
-        """
-        SELECT * from order_by_customer
-        WHERE O_W_ID=%s AND O_D_ID=%s AND O_C_ID=%s
-        """,
-        (w_id, d_id, c_id)
-    )
+    c_orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id, O_C_ID=c_id)
 
     warehouses = Warehouse.all()
     w_id_set = set()
