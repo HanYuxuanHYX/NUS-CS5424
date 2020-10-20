@@ -120,18 +120,24 @@ def stock_level_transaction(w_id, d_id, threshold, last):
             items.add(order_line.OL_I_ID)
     total_number = 0
     for item in items:
-        stock = Stock.filter(S_W_ID=w_id, S_I_ID=item.I_ID).get()
+        stock = Stock.filter(S_W_ID=w_id, S_I_ID=item).get()
         if stock.S_QUANTITY < threshold:
             total_number = total_number + 1
     print 'total number of items in S where its stock quantity at W_ID is below the threshold:', total_number
 
 
 def popular_item_transaction(w_id, d_id, last):
-    # Processing steps
+    # Processing steps & Output
+    print 'district identifier:', w_id, d_id
+    print 'number of last orders to be examined:', last
 
     orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id)[-last:]
-    popular_list = []
+    popular_items = set()
     for order in orders:
+        print 'order number:', order.O_ID, ', entry date and time:', order.O_ENTRY_D
+        customer = Customer.filter(C_W_ID=w_id, C_D_ID=d_id, C_ID=order.O_C_ID).get()
+        print 'name of the customer who placed this order:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST
+
         order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID)
         max_qty = 0
         popular_ols = []
@@ -141,22 +147,13 @@ def popular_item_transaction(w_id, d_id, last):
                 popular_ols = [order_line.OL_NUMBER]
             elif order_line.OL_QUANTITY == max_qty:
                 popular_ols.append(order_line.OL_NUMBER)
-        popular_list.append(popular_ols)
 
-    # Output
-
-    print 'district identifier:', w_id, d_id
-    print 'number of last orders to be examined:', last
-    popular_items = set()
-    for order, popular_ols in zip(orders, popular_list):
-        print 'order number:', order.O_ID, ', entry date and time:', order.O_ENTRY_D
-        customer = Customer.filter(C_W_ID=w_id, C_D_ID=d_id, C_ID=order.O_C_ID).get()
-        print 'name of the customer who placed this order:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST
         for popular_ol in popular_ols:
             order_line = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID, OL_NUMBER=popular_ol).get()
             item = Item.filter(I_ID=order_line.OL_I_ID).get()
             print '\titem name:', item.I_NAME, ', quantity ordered:', order_line.OL_QUANTITY
             popular_items.add(item)
+
     for popular_item in popular_items:
         print 'item name:', popular_item.I_NAME
         count = 0
@@ -171,11 +168,11 @@ def popular_item_transaction(w_id, d_id, last):
 
 def top_balance_transaction():
     # Processing steps:
-    customers = Customer.all()
-    customers = customers.sort(key=lambda x: x.C_BALANCE)[:10]
+    customers = Customer.all()[:]
+    customers.sort(key=lambda x: x.C_BALANCE, reverse=True)
 
     # Output
-    for customer in customers:
+    for customer in customers[:10]:
         print "name of the customer:", customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST
         print "balance of the customer's outstanding payment:", customer.C_BALANCE
 
@@ -188,25 +185,29 @@ def top_balance_transaction():
 def related_customer_transaction(w_id, d_id, c_id):
     # Processing steps:
     c_orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id, O_C_ID=c_id)
-
-    w_id_set = set(range(1, 11))
-    w_id_set.remove(w_id)
-
-    related_customers = set()
+    c_items_list = []
     for c_order in c_orders:
         c_order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=c_order.O_ID)
         c_items = set()
         for c_order_line in c_order_lines:
             c_items.add(c_order_line.OL_I_ID)
+        c_items_list.append(c_items)
 
-        for w in w_id_set:
-            orders = Order.filter(O_W_ID=w)
+    w_id_set = set(range(1, 11))
+    w_id_set.remove(w_id)
+    d_id_set = set(range(1, 11))
+
+    related_customers = set()
+
+    for w in w_id_set:
+        for d in d_id_set:
+            orders = Order.filter(O_W_ID=w, O_D_ID=d)
             for order in orders:
                 items = set()
                 order_lines = OrderLine.filter(OL_W_ID=order.O_W_ID, OL_D_ID=order.O_D_ID, OL_O_ID=order.O_ID)
                 for order_line in order_lines:
                     items.add(order_line.OL_I_ID)
-                if len(c_items.intersection(items)) >= 2:
+                if any(len(c_items.intersection(items)) for c_items in c_items_list) >= 2:
                     related_customers.add((order.O_W_ID, order.O_D_ID, order.O_C_ID))
 
     # Output
