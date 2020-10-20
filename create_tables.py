@@ -54,17 +54,11 @@ class Customer(Model):
     C_CREDIT = columns.Text(max_length=2)
     C_CREDIT_LIM = columns.Decimal()
     C_DISCOUNT = columns.Decimal()
+    C_BALANCE = columns.Decimal()
     C_YTD_PAYMENT = columns.Float()
     C_PAYMENT_CNT = columns.Integer()
     C_DELIVERY_CNT = columns.Integer()
     C_DATA = columns.Text(max_length=500)
-
-
-class CustomerByBalance(Model):
-    C_W_ID = columns.Integer(partition_key=True)
-    C_D_ID = columns.Integer(partition_key=True)
-    C_ID = columns.Integer(partition_key=True)
-    C_BALANCE = columns.Decimal(primary_key=True, clustering_order="DESC")
 
 
 class Order(Model):
@@ -130,7 +124,6 @@ if __name__ == '__main__':
     sync_table(Warehouse, KEY_SPACE, conns)
     sync_table(District, KEY_SPACE, conns)
     sync_table(Customer, KEY_SPACE, conns)
-    sync_table(CustomerByBalance, KEY_SPACE, conns)
     sync_table(Order, KEY_SPACE, conns)
     sync_table(Item, KEY_SPACE, conns)
     sync_table(OrderLine, KEY_SPACE, conns)

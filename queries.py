@@ -102,20 +102,19 @@ def payment_transaction(c_w_id, c_d_id, c_id, payment):
     warehouse = Warehouse.filter(W_ID=c_w_id).get()
     district = District.filter(D_W_ID=c_w_id, D_ID=c_d_id).get()
     customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
-    customer_by_balance = CustomerByBalance.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
     payment_dec = decimal.Decimal(payment)
 
     # Processing steps
 
     warehouse.update(W_YTD=warehouse.W_YTD + payment_dec)
     district.update(D_YTD=district.D_YTD + payment_dec)
-    customer_by_balance.update(C_BALANCE=customer_by_balance.C_BALANCE - payment_dec)
+    customer.update(C_BALANCE=customer.C_BALANCE - payment_dec)
     customer.update(C_YTD_PAYMENT=customer.C_YTD_PAYMENT + payment)
     customer.update(C_PAYMENT_CNT=customer.C_PAYMENT_CNT + 1)
 
     # Output
 
-    print 'customer identifier:', c_w_id, c_d_id, c_id, ', name:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST, ', address:', customer.C_STREET1, customer.C_STREET2, customer.C_CITY, customer.C_STATE, customer.C_ZIP, ', phone:', customer.C_PHONE, ', date and time when entry was created:', customer.C_SINCE, ', credit:', customer.C_CREDIT, ', credit limit', customer.C_CREDIT_LIM, ', discount:', customer.C_DISCOUNT, ', balance:', customer_by_balance.C_BALANCE
+    print 'customer identifier:', c_w_id, c_d_id, c_id, ', name:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST, ', address:', customer.C_STREET1, customer.C_STREET2, customer.C_CITY, customer.C_STATE, customer.C_ZIP, ', phone:', customer.C_PHONE, ', date and time when entry was created:', customer.C_SINCE, ', credit:', customer.C_CREDIT, ', credit limit', customer.C_CREDIT_LIM, ', discount:', customer.C_DISCOUNT, ', balance:', customer.C_BALANCE
     print 'warehouse address:', warehouse.W_STREET1, warehouse.W_STREET2, warehouse.W_CITY, warehouse.W_STATE, warehouse.W_ZIP
     print 'district address:', district.D_STREET1, district.D_STREET2, district.D_CITY, district.D_STATE, district.D_ZIP
     print 'payment amount:', payment
@@ -132,23 +131,22 @@ def delivery_transaction(w_id, carrier_id):
                 break
         x = Order.filter(O_W_ID=w_id, O_D_ID=district_no, O_ID=n).get()
         c = Customer.filter(C_W_ID=w_id, C_D_ID=district_no, C_ID=x.O_C_ID).get()
-        c_by_balance = Customer.filter(C_W_ID=w_id, C_D_ID=district_no, C_ID=x.O_C_ID).get()
+        c = Customer.filter(C_W_ID=w_id, C_D_ID=district_no, C_ID=x.O_C_ID).get()
         x.update(O_CARRIER_ID=carrier_id)
         order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=district_no, OL_O_ID=n)
         b = 0
         for order_line in order_lines:
             order_line.update(OL_DELIVERY_D=datetime.utcnow())
             b = b + order_line.OL_AMOUNT
-        c_by_balance.update(C_BALANCE=c_by_balance.C_BALANCE + b)
+        c.update(C_BALANCE=c.C_BALANCE + b)
         c.update(C_DELIVERY_CNT=c.C_DELIVERY_CNT + 1)
 
 
 def order_status_transaction(c_w_id, c_d_id, c_id):
     customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
-    customer_by_balance = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
 
     # Output
-    print 'customer name:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST, ', balance:', customer_by_balance.C_BALANCE
+    print 'customer name:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST, ', balance:', customer.C_BALANCE
     order = Order.filter(O_W_ID=c_w_id, O_D_ID=c_d_id, O_C_ID=c_id)[-1]
     print 'order number:', order.O_ID, ', entry date and time:', order.O_ENTRY_D, ', carrier identifier:', order.O_CARRIER_ID
     orderLines = OrderLine.filter(OL_W_ID=c_w_id, OL_D_ID=c_d_id, OL_O_ID=order.O_ID)
@@ -170,7 +168,7 @@ def stock_level_transaction(w_id, d_id, threshold, last):
 
 def top_balance_transaction():
     # Processing steps:
-    tops = CustomerByBalance.all()[:10]
+    tops = Customer.all()[:10]
 
     # Output
     for top in tops:
