@@ -4,8 +4,9 @@ from queries import *
 def parse_xact_file(path):
     with open(path) as xact_file:
         while True:
-            xact_params = xact_file.readline().split(',')
-            xact_type = xact_params[0]
+            line = xact_file.readline().split(',')
+            xact_type = line[0]
+            xact_params = [eval(param) for param in line[1:]]
 
             if xact_type == 'N':
                 c_id = xact_params[1]
@@ -15,8 +16,9 @@ def parse_xact_file(path):
                 item_num = []
                 supplier_warehouse = []
                 quantity = []
-                for _ in range(int(num_items)):
-                    item_params = xact_file.readline().split(',')
+                for _ in range(num_items):
+                    line = xact_file.readline().split(',')
+                    item_params = [eval(param) for param in line[1:]]
                     item_num.append(item_params[0])
                     supplier_warehouse.append(item_params[1])
                     quantity.append(item_params[2])
