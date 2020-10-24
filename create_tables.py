@@ -117,8 +117,8 @@ class Stock(Model):
 # see http://datastax.github.io/python-driver/api/cassandra/cluster.html for options
 # the list of hosts will be passed to create a Cluster() instance
 if __name__ == '__main__':
-    connection.register_connection('cluster1', IP_ADDRESS)
-    conns = ['cluster1']
+    connection.register_connection('default', IP_ADDRESS)
+    conns = ['default']
     for keyspace in KEY_SPACE:
         create_keyspace_simple(keyspace, replication_factor=3, connections=conns)
     sync_table(Warehouse, KEY_SPACE, conns)

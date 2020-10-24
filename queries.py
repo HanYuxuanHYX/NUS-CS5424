@@ -1,12 +1,9 @@
 import decimal
-import time
 from datetime import datetime
 from create_tables import *
 
 
 def new_order_transaction(w_id, d_id, c_id, num_items, item_num, supplier_warehouse, quantity):
-    start_time = time.time()
-
     warehouse = Warehouse.filter(W_ID=w_id).get()
     district = District.filter(D_W_ID=w_id, D_ID=d_id).get()
     customer = Customer.filter(C_W_ID=w_id, C_D_ID=d_id, C_ID=c_id).get()
@@ -57,12 +54,8 @@ def new_order_transaction(w_id, d_id, c_id, num_items, item_num, supplier_wareho
         print 'item number:', item_num[i], ', item name:', item.I_NAME, ', supplier warehouse:', supplier_warehouse[
             i], ', quantity:', quantity[i], ', amount:', order_line.OL_AMOUNT, ', stock quantity:', stock.S_QUANTITY
 
-    print "time elapsed:", time.time() - start_time
-
 
 def payment_transaction(c_w_id, c_d_id, c_id, payment):
-    start_time = time.time()
-
     warehouse = Warehouse.filter(W_ID=c_w_id).get()
     district = District.filter(D_W_ID=c_w_id, D_ID=c_d_id).get()
     customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
@@ -83,11 +76,8 @@ def payment_transaction(c_w_id, c_d_id, c_id, payment):
     print 'district address:', district.D_STREET1, district.D_STREET2, district.D_CITY, district.D_STATE, district.D_ZIP
     print 'payment amount:', payment
 
-    print "time elapsed:", time.time() - start_time
-
 
 def delivery_transaction(w_id, carrier_id):
-    start_time = time.time()
     # Processing steps
 
     for district_no in range(1, 11):
@@ -107,12 +97,8 @@ def delivery_transaction(w_id, carrier_id):
         c.update(C_BALANCE=c.C_BALANCE + b)
         c.update(C_DELIVERY_CNT=c.C_DELIVERY_CNT + 1)
 
-    print "time elapsed:", time.time() - start_time
-
 
 def order_status_transaction(c_w_id, c_d_id, c_id):
-    start_time = time.time()
-
     customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
 
     # Output
@@ -123,12 +109,8 @@ def order_status_transaction(c_w_id, c_d_id, c_id):
     for order_line in order_lines:
         print 'item number:', order_line.OL_I_ID, ',supplying warehouse number:', order_line.OL_SUPPLY_W_ID, 'quantity ordered:', order_line.OL_QUANTITY, 'total price for ordered item:', order_line.OL_AMOUNT, 'data and time of delivery:', order_line.OL_DELIVERY_D
 
-    print "time elapsed:", time.time() - start_time
-
 
 def stock_level_transaction(w_id, d_id, threshold, last):
-    start_time = time.time()
-
     # Processing steps
     orders = Order.filter(O_D_ID=d_id, O_W_ID=w_id)[-last:]
     items = set()
@@ -143,12 +125,8 @@ def stock_level_transaction(w_id, d_id, threshold, last):
             total_number = total_number + 1
     print 'total number of items below the threshold:', total_number
 
-    print "time elapsed:", time.time() - start_time
-
 
 def popular_item_transaction(w_id, d_id, last):
-    start_time = time.time()
-
     # Processing steps & Output
     print 'district identifier:', w_id, d_id
     print 'number of last orders to be examined:', last
@@ -185,12 +163,8 @@ def popular_item_transaction(w_id, d_id, last):
         count = sum((popular_item.I_ID in items) for items in items_by_order)
         print 'percentage of orders that contain this item:', (count / float(last)) * 100
 
-    print "time elapsed:", time.time() - start_time
-
 
 def top_balance_transaction():
-    start_time = time.time()
-
     # Processing steps:
     customers = Customer.all()[:]
     customers.sort(key=lambda x: x.C_BALANCE, reverse=True)
@@ -205,12 +179,8 @@ def top_balance_transaction():
         print 'warehouse name of customer:', warehouse.W_NAME
         print 'district name of customer:', district.D_NAME
 
-    print "time elapsed:", time.time() - start_time
-
 
 def related_customer_transaction(w_id, d_id, c_id):
-    start_time = time.time()
-
     # Processing steps:
     c_orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id, O_C_ID=c_id)
     c_items_list = []
@@ -222,20 +192,6 @@ def related_customer_transaction(w_id, d_id, c_id):
         c_items_list.append(c_items)
 
     related_customers = set()
-    # w_id_set = set(range(1, 11))
-    #     # w_id_set.remove(w_id)
-    #     # d_id_set = set(range(1, 11))
-
-    # for w in w_id_set:
-    #     for d in d_id_set:
-    #         orders = Order.filter(O_W_ID=w, O_D_ID=d)
-    #         for order in orders:
-    #             items = set()
-    #             order_lines = OrderLine.filter(OL_W_ID=order.O_W_ID, OL_D_ID=order.O_D_ID, OL_O_ID=order.O_ID)
-    #             for order_line in order_lines:
-    #                 items.add(order_line.OL_I_ID)
-    #             if any(len(c_items.intersection(items)) >= 2 for c_items in c_items_list):
-    #                 related_customers.add((order.O_W_ID, order.O_D_ID, order.O_C_ID))
 
     orders = Order.all()
     for order in orders:
@@ -252,8 +208,6 @@ def related_customer_transaction(w_id, d_id, c_id):
     print "customer identifier:", w_id, d_id, c_id
     for related_customer in related_customers:
         print "\trelated customer identifier:", related_customer
-
-    print "time elapsed:", time.time() - start_time
 
 
 if __name__ == '__main__':
