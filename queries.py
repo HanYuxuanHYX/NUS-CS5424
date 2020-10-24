@@ -193,22 +193,32 @@ def related_customer_transaction(w_id, d_id, c_id):
             c_items.add(c_order_line.OL_I_ID)
         c_items_list.append(c_items)
 
-    w_id_set = set(range(1, 11))
-    w_id_set.remove(w_id)
-    d_id_set = set(range(1, 11))
-
     related_customers = set()
+    # w_id_set = set(range(1, 11))
+    #     # w_id_set.remove(w_id)
+    #     # d_id_set = set(range(1, 11))
 
-    for w in w_id_set:
-        for d in d_id_set:
-            orders = Order.filter(O_W_ID=w, O_D_ID=d)
-            for order in orders:
-                items = set()
-                order_lines = OrderLine.filter(OL_W_ID=order.O_W_ID, OL_D_ID=order.O_D_ID, OL_O_ID=order.O_ID)
-                for order_line in order_lines:
-                    items.add(order_line.OL_I_ID)
-                if any(len(c_items.intersection(items)) for c_items in c_items_list) >= 2:
-                    related_customers.add((order.O_W_ID, order.O_D_ID, order.O_C_ID))
+    # for w in w_id_set:
+    #     for d in d_id_set:
+    #         orders = Order.filter(O_W_ID=w, O_D_ID=d)
+    #         for order in orders:
+    #             items = set()
+    #             order_lines = OrderLine.filter(OL_W_ID=order.O_W_ID, OL_D_ID=order.O_D_ID, OL_O_ID=order.O_ID)
+    #             for order_line in order_lines:
+    #                 items.add(order_line.OL_I_ID)
+    #             if any(len(c_items.intersection(items)) >= 2 for c_items in c_items_list):
+    #                 related_customers.add((order.O_W_ID, order.O_D_ID, order.O_C_ID))
+
+    orders = Order.all()
+    for order in orders:
+        if order.O_W_ID == w_id:
+            continue
+        items = set()
+        order_lines = OrderLine.filter(OL_W_ID=order.O_W_ID, OL_D_ID=order.O_D_ID, OL_O_ID=order.O_ID)
+        for order_line in order_lines:
+            items.add(order_line.OL_I_ID)
+        if any(len(c_items.intersection(items)) >= 2 for c_items in c_items_list):
+            related_customers.add((order.O_W_ID, order.O_D_ID, order.O_C_ID))
 
     # Output
     print "customer identifier:", w_id, d_id, c_id
