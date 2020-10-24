@@ -182,7 +182,7 @@ def popular_item_transaction(w_id, d_id, last):
 
     for popular_item in popular_items:
         print 'item name:', popular_item.I_NAME
-        count = sum((popular_item in items) for items in items_by_order)
+        count = sum((popular_item.I_ID in items) for items in items_by_order)
         print 'percentage of orders that contain this item:', (count / float(last)) * 100
 
     print "time elapsed:", time.time() - start_time
@@ -201,7 +201,7 @@ def top_balance_transaction():
         print "balance of the customer's outstanding payment:", customer.C_BALANCE
 
         warehouse = Warehouse.filter(W_ID=customer.C_W_ID).get()
-        district = District.filter(W_ID=customer.C_W_ID, D_ID=customer.C_D_ID).get()
+        district = District.filter(D_W_ID=customer.C_W_ID, D_ID=customer.C_D_ID).get()
         print 'warehouse name of customer:', warehouse.W_NAME
         print 'district name of customer:', district.D_NAME
 
