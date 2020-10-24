@@ -155,6 +155,7 @@ def popular_item_transaction(w_id, d_id, last):
 
     orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id)[-last:]
     popular_items = set()
+    items_by_order = []
     for order in orders:
         print 'order number:', order.O_ID, ', entry date and time:', order.O_ENTRY_D
         customer = Customer.filter(C_W_ID=w_id, C_D_ID=d_id, C_ID=order.O_C_ID).get()
@@ -163,13 +164,16 @@ def popular_item_transaction(w_id, d_id, last):
         order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID)
         max_qty = 0
         popular_ols = []
+        items = set()
         for order_line in order_lines:
+            items.add(order_line.OL_I_ID)
             if order_line.OL_QUANTITY > max_qty:
                 max_qty = order_line.OL_QUANTITY
                 popular_ols = [order_line.OL_NUMBER]
             elif order_line.OL_QUANTITY == max_qty:
                 popular_ols.append(order_line.OL_NUMBER)
 
+        items_by_order.append(items)
         for popular_ol in popular_ols:
             order_line = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID, OL_NUMBER=popular_ol).get()
             item = Item.filter(I_ID=order_line.OL_I_ID).get()
@@ -178,13 +182,7 @@ def popular_item_transaction(w_id, d_id, last):
 
     for popular_item in popular_items:
         print 'item name:', popular_item.I_NAME
-        count = 0
-        for order in orders:
-            order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID)
-            for order_line in order_lines:
-                if order_line.OL_I_ID == popular_item.I_ID:
-                    count += 1
-                    break
+        count = sum((popular_item in items) for items in items_by_order)
         print 'percentage of orders that contain this item:', (count / float(last)) * 100
 
     print "time elapsed:", time.time() - start_time
