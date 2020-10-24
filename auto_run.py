@@ -8,9 +8,9 @@ def parse_xact_file(path):
             xact_type = xact_params[0]
 
             if xact_type == 'N':
-                w_id = xact_params[1]
-                d_id = xact_params[2]
-                c_id = xact_params[3]
+                c_id = xact_params[1]
+                w_id = xact_params[2]
+                d_id = xact_params[3]
                 num_items = xact_params[4]
                 item_num = []
                 supplier_warehouse = []
