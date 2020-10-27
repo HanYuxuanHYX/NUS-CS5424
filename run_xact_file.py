@@ -68,15 +68,9 @@ def run_xact_file(exp_n, client_n):
 if __name__ == "__main__":
     experiment_number = sys.argv[1]
     client_number = sys.argv[2]
-
     if experiment_number == 1 or experiment_number == 3:
-        profile = ExecutionProfile(consistency_level=ConsistencyLevel.QUORUM,
-                                   serial_consistency_level=ConsistencyLevel.QUORUM)
+        connection.setup(IP_ADDRESS, KEY_SPACE[0], consistency=ConsistencyLevel.QUORUM)
     else:
-        profile = ExecutionProfile(consistency_level=ConsistencyLevel.ALL,
-                                   serial_consistency_level=ConsistencyLevel.ONE)
-    cluster = Cluster(IP_ADDRESS, execution_profiles={EXEC_PROFILE_DEFAULT: profile})
-    session = cluster.connect(KEY_SPACE[0])
-    connection.register_connection('default', session=session)
+        connection.setup(IP_ADDRESS, KEY_SPACE[0], consistency=ConsistencyLevel.ONE)
 
     run_xact_file(experiment_number, client_number)

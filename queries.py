@@ -84,18 +84,16 @@ def delivery_transaction(w_id, carrier_id):
         orders = Order.filter(O_W_ID=w_id, O_D_ID=district_no)
         for order in orders:
             if order.O_CARRIER_ID is None:
-                n = order.O_ID
-                break
-        x = Order.filter(O_W_ID=w_id, O_D_ID=district_no, O_ID=n).get()
-        c = Customer.filter(C_W_ID=w_id, C_D_ID=district_no, C_ID=x.O_C_ID).get()
-        x.update(O_CARRIER_ID=carrier_id)
-        order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=district_no, OL_O_ID=n)
-        b = 0
-        for order_line in order_lines:
-            order_line.update(OL_DELIVERY_D=datetime.utcnow())
-            b = b + order_line.OL_AMOUNT
-        c.update(C_BALANCE=c.C_BALANCE + b)
-        c.update(C_DELIVERY_CNT=c.C_DELIVERY_CNT + 1)
+                c = Customer.filter(C_W_ID=w_id, C_D_ID=district_no, C_ID=order.O_C_ID).get()
+                order.update(O_CARRIER_ID=carrier_id)
+                order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=district_no, OL_O_ID=order.O_ID)
+                b = 0
+                for order_line in order_lines:
+                    order_line.update(OL_DELIVERY_D=datetime.utcnow())
+                    b = b + order_line.OL_AMOUNT
+                c.update(C_BALANCE=c.C_BALANCE + b)
+                c.update(C_DELIVERY_CNT=c.C_DELIVERY_CNT + 1)
+                return
 
 
 def order_status_transaction(c_w_id, c_d_id, c_id):
