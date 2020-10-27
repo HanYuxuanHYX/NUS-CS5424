@@ -1,35 +1,34 @@
 import decimal
 from datetime import datetime
 from create_tables import *
+from cassandra import ConsistencyLevel
+
+READ_CONSISTENCY = ConsistencyLevel.QUORUM
+WRITE_CONSISTENCY = ConsistencyLevel.QUORUM
 
 
 def new_order_transaction(w_id, d_id, c_id, num_items, item_num, supplier_warehouse, quantity):
-    warehouse = Warehouse.filter(W_ID=w_id).get()
-    district = District.filter(D_W_ID=w_id, D_ID=d_id).get()
-    customer = Customer.filter(C_W_ID=w_id, C_D_ID=d_id, C_ID=c_id).get()
+    warehouse = Warehouse.filter(W_ID=w_id).consistency(READ_CONSISTENCY).get()
+    district = District.filter(D_W_ID=w_id, D_ID=d_id).consistency(WRITE_CONSISTENCY).get()
+    customer = Customer.filter(C_W_ID=w_id, C_D_ID=d_id, C_ID=c_id).consistency(READ_CONSISTENCY).get()
 
     # Processing steps
 
     n = district.D_NEXT_O_ID
-
     district.update(D_NEXT_O_ID=n + 1)
-
     entry_time = datetime.utcnow()
     local = all([w_id == i for i in supplier_warehouse])
     Order.create(O_ID=n, O_D_ID=d_id, O_W_ID=w_id, O_C_ID=c_id, O_ENTRY_D=entry_time,
                  O_OL_CNT=num_items, O_ALL_LOCAL=local)
 
     total_amount = 0
-
     for i in range(num_items):
-        item = Item.filter(I_ID=item_num[i]).get()
-        stock = Stock.filter(S_W_ID=w_id, S_I_ID=item_num[i]).get()
+        item = Item.filter(I_ID=item_num[i]).consistency(READ_CONSISTENCY).get()
+        stock = Stock.filter(S_W_ID=w_id, S_I_ID=item_num[i]).consistency(WRITE_CONSISTENCY).get()
         adjusted_qty = stock.S_QUANTITY - quantity[i]
         if adjusted_qty < 10:
             adjusted_qty += 100
-        stock.update(S_QUANTITY=adjusted_qty)
-        stock.update(S_YTD=stock.S_YTD + quantity[i])
-        stock.update(S_ORDER_CNT=stock.S_ORDER_CNT + 1)
+        stock.update(S_QUANTITY=adjusted_qty, S_YTD=stock.S_YTD + quantity[i], S_ORDER_CNT=stock.S_ORDER_CNT + 1)
         if supplier_warehouse[i] != w_id:
             stock.update(S_REMOTE_CNT=stock.S_REMOTE_CNT + 1)
         item_amount = quantity[i] * item.I_PRICE
@@ -48,26 +47,26 @@ def new_order_transaction(w_id, d_id, c_id, num_items, item_num, supplier_wareho
     print 'order number:', n, ', entry date:', entry_time
     print 'number of items:', num_items, ', total amount:', total_amount
     for i in range(num_items):
-        item = Item.filter(I_ID=item_num[i]).get()
-        stock = Stock.filter(S_W_ID=w_id, S_I_ID=item_num[i]).get()
-        order_line = OrderLine.filter(OL_O_ID=n, OL_D_ID=d_id, OL_W_ID=w_id, OL_NUMBER=i).get()
+        item = Item.filter(I_ID=item_num[i]).consistency(READ_CONSISTENCY).get()
+        stock = Stock.filter(S_W_ID=w_id, S_I_ID=item_num[i]).consistency(READ_CONSISTENCY).get()
+        order_line = OrderLine.filter(OL_O_ID=n, OL_D_ID=d_id, OL_W_ID=w_id, OL_NUMBER=i).consistency(
+            READ_CONSISTENCY).get()
         print 'item number:', item_num[i], ', item name:', item.I_NAME, ', supplier warehouse:', supplier_warehouse[
             i], ', quantity:', quantity[i], ', amount:', order_line.OL_AMOUNT, ', stock quantity:', stock.S_QUANTITY
 
 
 def payment_transaction(c_w_id, c_d_id, c_id, payment):
-    warehouse = Warehouse.filter(W_ID=c_w_id).get()
-    district = District.filter(D_W_ID=c_w_id, D_ID=c_d_id).get()
-    customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
+    warehouse = Warehouse.filter(W_ID=c_w_id).consistency(WRITE_CONSISTENCY).get()
+    district = District.filter(D_W_ID=c_w_id, D_ID=c_d_id).consistency(WRITE_CONSISTENCY).get()
+    customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).consistency(WRITE_CONSISTENCY).get()
     payment_dec = decimal.Decimal(payment)
 
     # Processing steps
 
     warehouse.update(W_YTD=warehouse.W_YTD + payment_dec)
     district.update(D_YTD=district.D_YTD + payment_dec)
-    customer.update(C_BALANCE=customer.C_BALANCE - payment_dec)
-    customer.update(C_YTD_PAYMENT=customer.C_YTD_PAYMENT + payment)
-    customer.update(C_PAYMENT_CNT=customer.C_PAYMENT_CNT + 1)
+    customer.update(C_BALANCE=customer.C_BALANCE - payment_dec, C_YTD_PAYMENT=customer.C_YTD_PAYMENT + payment,
+                    C_PAYMENT_CNT=customer.C_PAYMENT_CNT + 1)
 
     # Output
 
@@ -81,12 +80,14 @@ def delivery_transaction(w_id, carrier_id):
     # Processing steps
 
     for district_no in range(1, 11):
-        orders = Order.filter(O_W_ID=w_id, O_D_ID=district_no)
+        orders = Order.filter(O_W_ID=w_id, O_D_ID=district_no).consistency(WRITE_CONSISTENCY)
         for order in orders:
             if order.O_CARRIER_ID is None:
-                c = Customer.filter(C_W_ID=w_id, C_D_ID=district_no, C_ID=order.O_C_ID).get()
+                c = Customer.filter(C_W_ID=w_id, C_D_ID=district_no, C_ID=order.O_C_ID).consistency(
+                    WRITE_CONSISTENCY).get()
                 order.update(O_CARRIER_ID=carrier_id)
-                order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=district_no, OL_O_ID=order.O_ID)
+                order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=district_no, OL_O_ID=order.O_ID).consistency(
+                    WRITE_CONSISTENCY)
                 b = 0
                 for order_line in order_lines:
                     order_line.update(OL_DELIVERY_D=datetime.utcnow())
@@ -97,28 +98,28 @@ def delivery_transaction(w_id, carrier_id):
 
 
 def order_status_transaction(c_w_id, c_d_id, c_id):
-    customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).get()
+    customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).consistency(READ_CONSISTENCY).get()
 
     # Output
     print 'customer name:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST, ', balance:', customer.C_BALANCE
-    order = Order.filter(O_W_ID=c_w_id, O_D_ID=c_d_id, O_C_ID=c_id)[-1]
+    order = Order.filter(O_W_ID=c_w_id, O_D_ID=c_d_id, O_C_ID=c_id).consistency(READ_CONSISTENCY)[-1]
     print 'order number:', order.O_ID, ', entry date and time:', order.O_ENTRY_D, ', carrier identifier:', order.O_CARRIER_ID
-    order_lines = OrderLine.filter(OL_W_ID=c_w_id, OL_D_ID=c_d_id, OL_O_ID=order.O_ID)
+    order_lines = OrderLine.filter(OL_W_ID=c_w_id, OL_D_ID=c_d_id, OL_O_ID=order.O_ID).consistency(READ_CONSISTENCY)
     for order_line in order_lines:
         print 'item number:', order_line.OL_I_ID, ',supplying warehouse number:', order_line.OL_SUPPLY_W_ID, 'quantity ordered:', order_line.OL_QUANTITY, 'total price for ordered item:', order_line.OL_AMOUNT, 'data and time of delivery:', order_line.OL_DELIVERY_D
 
 
 def stock_level_transaction(w_id, d_id, threshold, last):
     # Processing steps
-    orders = Order.filter(O_D_ID=d_id, O_W_ID=w_id)[-last:]
+    orders = Order.filter(O_D_ID=d_id, O_W_ID=w_id).consistency(READ_CONSISTENCY)[-last:]
     items = set()
     for order in orders:
-        order_lines = OrderLine.filter(OL_D_ID=d_id, OL_W_ID=w_id, OL_O_ID=order.O_ID)
+        order_lines = OrderLine.filter(OL_D_ID=d_id, OL_W_ID=w_id, OL_O_ID=order.O_ID).consistency(READ_CONSISTENCY)
         for order_line in order_lines:
             items.add(order_line.OL_I_ID)
     total_number = 0
     for item in items:
-        stock = Stock.filter(S_W_ID=w_id, S_I_ID=item).get()
+        stock = Stock.filter(S_W_ID=w_id, S_I_ID=item).consistency(READ_CONSISTENCY).get()
         if stock.S_QUANTITY < threshold:
             total_number = total_number + 1
     print 'total number of items below the threshold:', total_number
@@ -129,15 +130,15 @@ def popular_item_transaction(w_id, d_id, last):
     print 'district identifier:', w_id, d_id
     print 'number of last orders to be examined:', last
 
-    orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id)[-last:]
+    orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id).consistency(READ_CONSISTENCY)[-last:]
     popular_items = set()
     items_by_order = []
     for order in orders:
         print 'order number:', order.O_ID, ', entry date and time:', order.O_ENTRY_D
-        customer = Customer.filter(C_W_ID=w_id, C_D_ID=d_id, C_ID=order.O_C_ID).get()
+        customer = Customer.filter(C_W_ID=w_id, C_D_ID=d_id, C_ID=order.O_C_ID).consistency(READ_CONSISTENCY).get()
         print 'name of the customer who placed this order:', customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST
 
-        order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID)
+        order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID).consistency(READ_CONSISTENCY)
         max_qty = 0
         popular_ols = []
         items = set()
@@ -151,8 +152,9 @@ def popular_item_transaction(w_id, d_id, last):
 
         items_by_order.append(items)
         for popular_ol in popular_ols:
-            order_line = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID, OL_NUMBER=popular_ol).get()
-            item = Item.filter(I_ID=order_line.OL_I_ID).get()
+            order_line = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=order.O_ID,
+                                          OL_NUMBER=popular_ol).consistency(READ_CONSISTENCY).get()
+            item = Item.filter(I_ID=order_line.OL_I_ID).consistency(READ_CONSISTENCY).get()
             print '\titem name:', item.I_NAME, ', quantity ordered:', order_line.OL_QUANTITY
             popular_items.add(item)
 
@@ -172,18 +174,18 @@ def top_balance_transaction():
         print "name of the customer:", customer.C_FIRST, customer.C_MIDDLE, customer.C_LAST
         print "balance of the customer's outstanding payment:", customer.C_BALANCE
 
-        warehouse = Warehouse.filter(W_ID=customer.C_W_ID).get()
-        district = District.filter(D_W_ID=customer.C_W_ID, D_ID=customer.C_D_ID).get()
+        warehouse = Warehouse.filter(W_ID=customer.C_W_ID).consistency(READ_CONSISTENCY).get()
+        district = District.filter(D_W_ID=customer.C_W_ID, D_ID=customer.C_D_ID).consistency(READ_CONSISTENCY).get()
         print 'warehouse name of customer:', warehouse.W_NAME
         print 'district name of customer:', district.D_NAME
 
 
 def related_customer_transaction(w_id, d_id, c_id):
     # Processing steps:
-    c_orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id, O_C_ID=c_id)
+    c_orders = Order.filter(O_W_ID=w_id, O_D_ID=d_id, O_C_ID=c_id).consistency(READ_CONSISTENCY)
     c_items_list = []
     for c_order in c_orders:
-        c_order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=c_order.O_ID)
+        c_order_lines = OrderLine.filter(OL_W_ID=w_id, OL_D_ID=d_id, OL_O_ID=c_order.O_ID).consistency(READ_CONSISTENCY)
         c_items = set()
         for c_order_line in c_order_lines:
             c_items.add(c_order_line.OL_I_ID)
@@ -196,7 +198,8 @@ def related_customer_transaction(w_id, d_id, c_id):
         if order.O_W_ID == w_id:
             continue
         items = set()
-        order_lines = OrderLine.filter(OL_W_ID=order.O_W_ID, OL_D_ID=order.O_D_ID, OL_O_ID=order.O_ID)
+        order_lines = OrderLine.filter(OL_W_ID=order.O_W_ID, OL_D_ID=order.O_D_ID, OL_O_ID=order.O_ID).consistency(
+            READ_CONSISTENCY)
         for order_line in order_lines:
             items.add(order_line.OL_I_ID)
         if any(len(c_items.intersection(items)) >= 2 for c_items in c_items_list):

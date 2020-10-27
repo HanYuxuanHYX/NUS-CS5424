@@ -2,7 +2,6 @@ import sys
 import time
 import csv
 from cassandra.cluster import ExecutionProfile, EXEC_PROFILE_DEFAULT
-from cassandra import ConsistencyLevel
 from queries import *
 
 
@@ -58,7 +57,7 @@ def run_xact_file(exp_n, client_n):
     median_latency = sorted_times[n_xact % 2]
     percentile_95 = sorted_times[int(n_xact * 0.95)]
     percentile_99 = sorted_times[int(n_xact * 0.99)]
-    with open('clients.csv', 'a') as f:
+    with open('output/clients.csv', 'a') as f:
         writer = csv.writer(f)
         writer.writerow(
             [exp_n, client_n, n_xact, total_time, throughput, average_latency, median_latency, percentile_95,
@@ -69,8 +68,11 @@ if __name__ == "__main__":
     experiment_number = sys.argv[1]
     client_number = sys.argv[2]
     if experiment_number == 1 or experiment_number == 3:
-        connection.setup(IP_ADDRESS, KEY_SPACE[0], consistency=ConsistencyLevel.QUORUM)
+        READ_CONSISTENCY = ConsistencyLevel.QUORUM
+        WRITE_CONSISTENCY = ConsistencyLevel.QUORUM
     else:
-        connection.setup(IP_ADDRESS, KEY_SPACE[0], consistency=ConsistencyLevel.ONE)
+        READ_CONSISTENCY = ConsistencyLevel.ONE
+        WRITE_CONSISTENCY = ConsistencyLevel.ALL
 
+    connection.setup(IP_ADDRESS, KEY_SPACE[0])
     run_xact_file(experiment_number, client_number)
