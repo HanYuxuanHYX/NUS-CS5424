@@ -39,7 +39,7 @@ python insert_records.py
 ## Run Experiments & Collect Statistics
 run experiment: 
 ```
-bash run_experiment \[experiment number] \[node number]
+bash run_experiment [experiment number] [node number]
 ```
 collect statistics: 
 ```
