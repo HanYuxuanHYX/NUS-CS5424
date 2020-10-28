@@ -2,15 +2,20 @@
 
 ## Setup
 
-### Setup Cassandra & Datastax Python Driver
-https://cassandra.apache.org/doc/latest/getting_started/index.html <br>
-https://docs.datastax.com/en/developer/python-driver/3.24/
+### Setup Cassandra
+https://cassandra.apache.org/doc/latest/getting_started/index.html
 
 ### Setup Python Environment
+You may use pipenv,
 ```
 pip install pipenv
-pipenv shell
 pipenv install
+pipenv shell
+```
+Or manually install
+```
+pip install cassandra-driver
+pip install tqdm
 ```
 
 ### Download Data
@@ -29,4 +34,11 @@ Create tables & insert initial data.
 ```
 python create_tables.py
 python insert_records.py
+```
+
+## Run Experiments
+syntax: bash run_experiment \[experiment number] \[node number]
+example:
+```
+bash run_experiment 1 1
 ```
