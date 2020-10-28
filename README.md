@@ -36,9 +36,12 @@ python create_tables.py
 python insert_records.py
 ```
 
-## Run Experiments
-syntax: bash run_experiment \[experiment number] \[node number]
-example:
+## Run Experiments & Collect Statistics
+run experiment: 
 ```
-bash run_experiment 1 1
+bash run_experiment \[experiment number] \[node number]
+```
+collect statistics: 
+```
+python collect_database_state.py
 ```
