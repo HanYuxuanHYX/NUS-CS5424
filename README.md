@@ -20,10 +20,13 @@ unzip project-files.zip
 ```
 
 ## Preparation
-First, start Cassandra.
-Then, create tables, materialized views & insert rows:
+Start Cassandra.
+```
+cd /path/to/cassandra (in the cluster: cd /temp/apache-cassandra-4.0-beta2/)
+bin/cassandra
+```
+Create tables & insert initial data.
 ```
 python create_tables.py
-python create_materialized_views.py
 python insert_records.py
 ```
