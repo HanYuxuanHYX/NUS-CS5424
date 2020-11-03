@@ -3,6 +3,8 @@
 EXPERIMENT_N=$1
 NODE_N=$2
 
+[ ! -d "output" ] && mkdir output
+
 source /home/stuproj/cs4224l/miniconda3/etc/profile.d/conda.sh
 conda activate cassandra
 

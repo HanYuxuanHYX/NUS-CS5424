@@ -52,7 +52,7 @@ def run_xact_file(exp_n, client_n):
     n_xact = len(xact_times)
     total_time = sum(xact_times)
     throughput = n_xact / total_time
-    average_latency = 1000 / throughput
+    average_latency = 1 / throughput
     sorted_times = sorted(xact_times)
     median_latency = sorted_times[n_xact % 2]
     percentile_95 = sorted_times[int(n_xact * 0.95)]

@@ -3,7 +3,6 @@ import csv
 
 if __name__ == "__main__":
     connection.setup(IP_ADDRESS, KEY_SPACE[0])
-
     statistics = [0] * 15
     warehouses = Warehouse.all()
     districts = District.all()

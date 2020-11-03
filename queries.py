@@ -3,8 +3,8 @@ from datetime import datetime
 from create_tables import *
 from cassandra import ConsistencyLevel
 
-READ_CONSISTENCY = ConsistencyLevel.QUORUM
-WRITE_CONSISTENCY = ConsistencyLevel.QUORUM
+READ_CONSISTENCY = ConsistencyLevel.ONE
+WRITE_CONSISTENCY = ConsistencyLevel.ALL
 
 
 def new_order_transaction(w_id, d_id, c_id, num_items, item_num, supplier_warehouse, quantity):
@@ -213,11 +213,11 @@ def related_customer_transaction(w_id, d_id, c_id):
 
 if __name__ == '__main__':
     connection.setup(IP_ADDRESS, KEY_SPACE[0])
-    # new_order_transaction(1, 1, 1279, 2, [68195, 26567], [1, 1], [1, 5])
-    # payment_transaction(1, 1, 1, 20000.8)
-    # delivery_transaction(1, 1)
-    # order_status_transaction(1, 1, 1)
-    # stock_level_transaction(1, 1, 1000, 50)
-    # popular_item_transaction(1, 1, 50)
-    # top_balance_transaction()
-    # related_customer_transaction(1, 1, 1)
+    new_order_transaction(1, 1, 1279, 2, [68195, 26567], [1, 1], [1, 5])
+    payment_transaction(1, 1, 1, 20000.8)
+    delivery_transaction(1, 1)
+    order_status_transaction(1, 1, 1)
+    stock_level_transaction(1, 1, 1000, 50)
+    popular_item_transaction(1, 1, 50)
+    top_balance_transaction()
+    related_customer_transaction(1, 1, 1)
