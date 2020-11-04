@@ -61,8 +61,6 @@ def payment_transaction(c_w_id, c_d_id, c_id, payment):
     customer = Customer.filter(C_W_ID=c_w_id, C_D_ID=c_d_id, C_ID=c_id).consistency(WRITE_CONSISTENCY).get()
     payment_dec = decimal.Decimal(payment)
 
-    # Processing steps
-
     warehouse.update(W_YTD=warehouse.W_YTD + payment_dec)
     district.update(D_YTD=district.D_YTD + payment_dec)
     customer.update(C_BALANCE=customer.C_BALANCE - payment_dec, C_YTD_PAYMENT=customer.C_YTD_PAYMENT + payment,
