@@ -83,7 +83,7 @@ class Item(Model):
 class OrderLine(Model):
     OL_W_ID = columns.Integer(partition_key=True)
     OL_D_ID = columns.Integer(partition_key=True)
-    OL_O_ID = columns.Integer(primary_key=True)
+    OL_O_ID = columns.Integer(partition_key=True)
     OL_NUMBER = columns.Integer(primary_key=True)
     OL_I_ID = columns.Integer()
     OL_DELIVERY_D = columns.DateTime(required=False)
