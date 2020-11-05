@@ -37,6 +37,12 @@ python insert_records.py
 ```
 
 ## Run Experiments & Collect Statistics
+test a single transaction:
+```
+vim queries.py
+uncomment the query you want to try out, save & exit
+python queries.py
+```
 run experiment: 
 ```
 bash run_experiment [experiment number] [node number]
