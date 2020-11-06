@@ -25,8 +25,9 @@ unzip project-files.zip
 ```
 
 ## Preparation
-To run in a single machine: modify IP_ADDRESS in create_tables.py to '127.0.0.1'. 
-To run in a cluster: follow https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/initialize/initSingleDS.html to configure cassandra environment, then modify IP_ADDRESS in create_tables.py to a seed address. 
+To run in a single machine: modify ```IP_ADDRESS``` in ```create_tables.py``` to '127.0.0.1'  
+
+To run in a cluster: follow https://docs.datastax.com/en/cassandra-oss/3.0/cassandra/initialize/initSingleDS.html to configure cassandra environment, then modify ```IP_ADDRESS``` in ```create_tables.py``` to a seed address. 
 
 Start Cassandra.
 ```
